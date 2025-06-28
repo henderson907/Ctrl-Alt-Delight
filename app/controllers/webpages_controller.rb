@@ -4,6 +4,7 @@ require 'openai'
 require 'dotenv/load'
 
 class WebpagesController < ApplicationController
+  skip_before_action :authenticate_user!, only: [ :index, :show, :create ]
   before_action :webpage_params, only: [ :create ]
 
   INCLUSIVE_TERMS = {
