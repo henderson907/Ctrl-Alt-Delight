@@ -4,4 +4,5 @@ class Webpage < ApplicationRecord
   serialize :inclusive_terms_found, coder: YAML
   serialize :exclusionary_phrases_found, coder: YAML
   serialize :green_keywords_found, coder: YAML
+  serialize :keyword_tags_found, coder: YAML
 end

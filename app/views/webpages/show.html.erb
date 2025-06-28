@@ -8,7 +8,7 @@
     <button class="tablink" onclick="openTab(event, 'toc')">Table of Contents</button>
     <button class="tablink" onclick="openTab(event, 'wordcount')">Word Count</button>
     <button class="tablink" onclick="openTab(event, 'frequentwords')">Frequent Words</button>
-    <button class="tablink" onclick="openTab(event, 'inclusive')">Inclusive & Green Analysis</button>
+    <button class="tablink" onclick="openTab(event, 'keyword_tags')">Keyword Tags</button>
     <button class="tablink" onclick="openTab(event, 'openai_summary')">OpenAI Job Summary</button>
   </div>
 
@@ -32,32 +32,71 @@
       <p>No frequent words available.</p>
     <% end %>
   </div>
-  <div id="inclusive" class="tabcontent" style="display:none">
-    <h2>Inclusive Terms Found</h2>
-    <% if @inclusive_terms_found.present? %>
-      <% @inclusive_terms_found.each do |category, terms| %>
-        <strong><%= category.to_s.humanize %>:</strong> <%= terms.join(", ") %><br>
+  <div id="keyword_tags" class="tabcontent" style="display:none">
+    <h2>Keyword Tags Found</h2>
+    <% if @keyword_tags_found.present? && @keyword_tags_found.any? %>
+      <ul>
+        <% @keyword_tags_found.each do |category, terms| %>
+          <li>
+            <strong><%= category.to_s.humanize %>:</strong>
+            <%= terms.join(", ") %>
+          </li>
+        <% end %>
+      </ul>
+    <% else %>
+      <p>None found.</p>
+    <% end %>
+    <h2>Keyword Tags Not Found</h2>
+    <% if defined?(WebpagesController::KEYWORD_TAGS) %>
+      <% not_found = WebpagesController::KEYWORD_TAGS.keys.map(&:to_s) - (@keyword_tags_found&.keys&.map(&:to_s) || []) %>
+      <% if not_found.any? %>
+        <ul>
+          <% not_found.each do |category| %>
+            <li><%= category.humanize %></li>
+          <% end %>
+        </ul>
+      <% else %>
+        <p>All tags found!</p>
       <% end %>
-    <% else %>
-      <p>None found.</p>
-    <% end %>
-    <h2>Exclusionary Phrases Found</h2>
-    <% if @exclusionary_phrases_found.present? %>
-      <%= @exclusionary_phrases_found.join(", ") %>
-    <% else %>
-      <p>None found.</p>
-    <% end %>
-    <h2>Green Keywords Found</h2>
-    <% if @green_keywords_found.present? %>
-      <%= @green_keywords_found.join(", ") %>
-    <% else %>
-      <p>None found.</p>
     <% end %>
   </div>
   <div id="openai_summary" class="tabcontent" style="display:none">
     <h2>OpenAI Job Summary</h2>
     <% if @webpage.openai_summary.present? %>
-      <p><%= @webpage.openai_summary %></p>
+      <% # Improved regex: case-insensitive, flexible whitespace, multiline %>
+      <% positives = @webpage.openai_summary[/Positives\s*:(.*?)(Red Flags\s*:|Summary\s*:|\z)/im, 1]&.strip %>
+      <% red_flags = @webpage.openai_summary[/Red Flags\s*:(.*?)(Summary\s*:|\z)/im, 1]&.strip %>
+      <% summary = @webpage.openai_summary[/Summary\s*:(.*)/im, 1]&.strip %>
+
+      <% # Remove any leading numbers/dots from extracted sections %>
+      <% positives = positives&.gsub(/^\d+\.?\s*$/m, '')&.strip %>
+      <% red_flags = red_flags&.gsub(/^\d+\.?\s*$/m, '')&.strip %>
+      <% summary = summary&.gsub(/^\d+\.?\s*$/m, '')&.strip %>
+
+      <div class="openai-section">
+        <h3>Positives</h3>
+        <% if positives.present? %>
+          <p><%= simple_format(positives) %></p>
+        <% else %>
+          <p><em>None listed.</em></p>
+        <% end %>
+      </div>
+      <div class="openai-section">
+        <h3>Red Flags</h3>
+        <% if red_flags.present? %>
+          <p><%= simple_format(red_flags) %></p>
+        <% else %>
+          <p><em>None listed.</em></p>
+        <% end %>
+      </div>
+      <div class="openai-section">
+        <h3>Summary</h3>
+        <% if summary.present? %>
+          <p><%= simple_format(summary) %></p>
+        <% else %>
+          <p><em>No summary provided.</em></p>
+        <% end %>
+      </div>
     <% else %>
       <p>No summary available.</p>
     <% end %>

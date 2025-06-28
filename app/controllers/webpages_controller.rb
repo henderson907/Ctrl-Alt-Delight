@@ -36,7 +36,11 @@ class WebpagesController < ApplicationController
 
   def show
     @webpage = Webpage.find(params[:id])
-    @keyword_tags_found = @webpage.keyword_tags_found
+    begin
+      @keyword_tags_found = @webpage.keyword_tags_found
+    rescue Psych::SyntaxError
+      @keyword_tags_found = {}
+    end
   end
 
   def create
@@ -62,6 +66,19 @@ class WebpagesController < ApplicationController
       flash[:alert] = "You must enter a valid URL"
       redirect_to root_path
     end
+  end
+
+  def keyword_search
+    @all_keywords = KEYWORD_TAGS.keys.map(&:to_s)
+    @selected_keywords = params[:keywords] || []
+    @jobs = []
+  end
+
+  def keyword_search_results
+    @all_keywords = KEYWORD_TAGS.keys.map(&:to_s)
+    @selected_keywords = params[:keywords] || []
+    @jobs = filter_jobs_by_keywords(@selected_keywords)
+    render :keyword_search
   end
 
   private
@@ -169,6 +186,14 @@ class WebpagesController < ApplicationController
     Rails.logger.error e.backtrace.join("\n")
     Rails.logger.error "Prompt: #{prompt.inspect}"
     "OpenAI summary unavailable: #{e.class}: #{e.message}"
+  end
+
+  def filter_jobs_by_keywords(selected_keywords)
+    return [] if selected_keywords.blank?
+    Webpage.where.not(keyword_tags_found: nil).select do |webpage|
+      found = (webpage.keyword_tags_found || {}).keys.map(&:to_s)
+      (found & selected_keywords).any?
+    end
   end
 
   def webpage_params
