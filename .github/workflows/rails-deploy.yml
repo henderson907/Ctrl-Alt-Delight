@@ -29,7 +29,7 @@ jobs:
           bundle config --delete disable_platform_warnings
           
           # Force clean install
-          bundle install --clean --jobs 4 --retry 3
+          bundle install --clean --force --jobs 4 --retry 3
 
       - name: Setup database
         run: |
