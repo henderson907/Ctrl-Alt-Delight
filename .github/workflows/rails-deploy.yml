@@ -23,8 +23,8 @@ jobs:
 
       - name: Install dependencies
         run: |
-          bundle lock --add-platform x86_64-linux
-          bundle install
+          bundle config set --local force_ruby_platform true
+          bundle install --jobs 4 --retry 3
 
       - name: Setup database
         run: |
