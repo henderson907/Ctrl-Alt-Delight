@@ -7,17 +7,25 @@ class WebpagesController < ApplicationController
   skip_before_action :authenticate_user!, only: [ :index, :show, :create ]
   before_action :webpage_params, only: [ :create ]
 
-  INCLUSIVE_TERMS = {
-    parental_leave: ["maternity leave", "paternity leave", "parental leave"],
-    mental_health: ["mental health", "wellbeing", "counselling"],
-    remote_friendly: ["remote-friendly", "hybrid", "flexible working"],
-    disability_support: ["reasonable adjustments", "wheelchair accessible", "neurodiverse"],
-    lgbtq_inclusive: ["LGBTQ+", "Pride", "inclusive culture"],
+  # Updated keyword tags as requested
+  KEYWORD_TAGS = {
+    fertility_support: ["fertility support", "menopause care"],
+    pay_transparency: ["pay transparency", "salary transparency"],
+    flexible_work: ["flexible work hours", "remote-first", "flexible schedule", "hybrid working"],
+    name_blind_recruitment: ["name-blind recruitment"],
+    religious_inclusion: ["prayer space", "flexible religious leave", "eid leave", "religious holidays"],
+    lgbtq_inclusive: ["lgbtqia+", "pride", "queer inclusive"],
+    alt_education: ["non-traditional educational background", "no degree required", "bootcamp graduate"],
+    ethnic_networks: ["black employee network", "asian employee network", "diversity network"],
+    accessibility: ["step-free access", "wheelchair accessible", "accessible office"],
+    inclusive_env: ["inclusive work environment", "inclusive culture"],
+    green_career: ["green career", "climate job", "sustainability role"],
+    mental_health: ["mental health", "mental health days", "counselling", "wellbeing"],
+    social_sustainability: ["social sustainability"],
+    wellness_programs: ["wellness programs", "health & wellness", "gym membership"],
+    cycling_scheme: ["bike-to-work scheme", "cycle to work"],
+    carbon_neutral: ["carbon neutrality", "carbon neutral", "net zero"]
   }
-
-  EXCLUSIONARY_PHRASES = ["must-have", "rockstar", "native english", "perfect communication"]
-
-  GREEN_KEYWORDS = ["sustainability", "climate", "net zero", "carbon", "energy", "renewable"]
 
   STOP_WORDS = %w[the of and a to in is it you that he was for on are as with his they I at be this have from or one had by word but not what all were we when your can said there use an each which she do how their if]
 
@@ -28,10 +36,7 @@ class WebpagesController < ApplicationController
 
   def show
     @webpage = Webpage.find(params[:id])
-    # For display in the show view
-    @inclusive_terms_found = @webpage.inclusive_terms_found
-    @exclusionary_phrases_found = @webpage.exclusionary_phrases_found
-    @green_keywords_found = @webpage.green_keywords_found
+    @keyword_tags_found = @webpage.keyword_tags_found
   end
 
   def create
@@ -45,10 +50,7 @@ class WebpagesController < ApplicationController
       @webpage.frequent_words = format_frequent_words(word_list)
       text = doc.text
       @webpage.full_text = text
-      @webpage.inclusive_terms_found = keyword_presence(text, INCLUSIVE_TERMS)
-      @webpage.exclusionary_phrases_found = phrase_presence(text, EXCLUSIONARY_PHRASES)
-      @webpage.green_keywords_found = phrase_presence(text, GREEN_KEYWORDS)
-      # Call OpenAI for summary and red flags
+      @webpage.keyword_tags_found = keyword_presence(text, KEYWORD_TAGS)
       @webpage.openai_summary = get_openai_summary(text)
       if @webpage.save
         redirect_to webpage_path(@webpage)
@@ -143,17 +145,16 @@ class WebpagesController < ApplicationController
     results
   end
 
-  def phrase_presence(text, phrases)
-    phrases.select { |phrase| text.downcase.include?(phrase.downcase) }
-  end
-
   def get_openai_summary(text)
     client = OpenAI::Client.new(access_token: ENV["OPENAI_API_KEY"])
     prompt = <<~PROMPT
       Here is a job description:
       #{text}
 
-      Please provide a brief summary of whether this is a good job to apply for, and mention any red flags or concerns you notice.
+      Please return only the following three sections, each clearly labeled:
+      1. Positives: List the positive aspects of this job.
+      2. Red Flags: List any concerns or red flags.
+      3. Summary: Provide a brief summary of the job in 1-2 sentences.
     PROMPT
     response = client.chat(
       parameters: {
