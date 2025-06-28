@@ -23,6 +23,7 @@ jobs:
 
       - name: Install dependencies
         run: |
+          bundle lock --add-platform x86_64-linux
           bundle config set --local deployment 'false'
           bundle install
 
