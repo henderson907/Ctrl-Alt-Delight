@@ -1,0 +1,23 @@
+<header>
+  <h1><%= @webpage.page_title %></h1>
+  <p><%= link_to @webpage.url, @webpage.url %></p>
+</header>
+
+<main>
+  <section>
+    <h2>Table of Contents</h2>
+    <%= @webpage.table_of_contents.html_safe %>
+  </section>
+
+  <section>
+    <h2>Total Word Count</h2>
+    <p><%= @webpage.total_word_count %></p>
+  </section>
+
+  <section>
+    <h2>Top 10 Most Frequent Words</h2>
+    <%= @webpage.frequent_words.html_safe %>
+  </section>
+
+  <%= link_to "&#x21A9 Back to main".html_safe, root_path %>
+</main>

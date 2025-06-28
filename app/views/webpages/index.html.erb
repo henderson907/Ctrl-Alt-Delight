@@ -1,0 +1,31 @@
+<body cz-shortcut-listen="true">
+<header>
+  <h1>Web Page Analyzer</h1>
+  <%= form_for @webpage, url: {action: "create"} do |f| %>
+    <%= f.url_field :url, placeholder: "Enter the URL..." %>
+    <%= f.submit "Analyze", class: "analyze-button" %>
+  <% end %>
+</header>
+
+<main>
+  <section>
+    <h2>Previously Analyzed Pages</h2>
+    <% if @webpages.empty?%>
+      <p>Hmm, looks like you haven't analyzed any pages yet! To get you started, why don't you try:</p>
+      <%# Used stimulus to add a copy to clipboard button %>
+      <div data-controller="clipboard">
+        <div data-clipboard-target="content" class="copy-link">https://github.com/henderson907</div>
+        <button data-action="clipboard#copy" data-clipboard-target="button"><%= image_tag "copy.png", class: "copy-link-button" %></button>
+      </div>
+    <% else %>
+      <ul>
+        <% @webpages.each do |webpage| %>
+          <li><%= link_to webpage.page_title, webpage_path(webpage) %></li>
+        <% end %>
+      </ul>
+    <% end %>
+
+  </section>
+</main>
+
+</body>
