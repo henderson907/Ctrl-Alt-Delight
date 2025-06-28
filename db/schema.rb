@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_06_13_222407) do
+ActiveRecord::Schema[8.0].define(version: 2025_06_28_153034) do
   create_table "webpages", force: :cascade do |t|
     t.string "url"
     t.string "page_title"
@@ -19,5 +19,10 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_13_222407) do
     t.text "table_of_contents"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.text "inclusive_terms_found"
+    t.text "exclusionary_phrases_found"
+    t.text "green_keywords_found"
+    t.text "full_text"
+    t.text "openai_summary"
   end
 end
