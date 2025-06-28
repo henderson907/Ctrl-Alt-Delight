@@ -23,6 +23,8 @@ jobs:
 
       - name: Install dependencies
         run: |
+          # Force bundle to ignore platform restrictions
+          bundle config set --local disable_platform_warnings true
           bundle config set --local force_ruby_platform true
           bundle install --jobs 4 --retry 3
 
