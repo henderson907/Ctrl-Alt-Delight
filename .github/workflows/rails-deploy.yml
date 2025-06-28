@@ -19,12 +19,11 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: 3.4.2
-          bundler-cache: true
+          bundler-cache: false
 
       - name: Install dependencies
         run: |
           bundle lock --add-platform x86_64-linux
-          bundle config set --local deployment 'false'
           bundle install
 
       - name: Setup database
