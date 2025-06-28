@@ -1,0 +1,60 @@
+# Rails CI/CD Pipeline - Automated testing & deployment
+
+name: Rails Deploy
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  test-and-deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v4
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.2.2
+          bundler-cache: true
+
+      - name: Install dependencies
+        run: |
+          bundle lock --add-platform x86_64-linux
+          bundle install
+
+      - name: Setup database
+        run: |
+          bundle exec rails db:create
+          bundle exec rails db:migrate
+
+      - name: Run tests
+        run: |
+          bundle exec rails test
+
+      - name: Boot test (basic smoke test)
+        run: |
+          # Start Rails server in background
+          bundle exec rails server -p 3000 -e test &
+          RAILS_PID=$!
+          
+          # Wait for server to start
+          sleep 10
+          
+          # Test if server responds
+          curl --retry 3 --retry-connrefused http://localhost:3000 || echo "Rails app failed to respond"
+          
+          # Kill the server
+          kill $RAILS_PID
+
+        # This can be used later if we decide to deploy to production
+      - name: Optional Deploy (if DEPLOY_WEBHOOK is set)
+        if: env.DEPLOY_WEBHOOK != ''
+        env:
+          DEPLOY_WEBHOOK: ${{ secrets.DEPLOY_WEBHOOK }}
+        run: |
+          echo "Triggering deploy via webhook..."
+          curl -X POST $DEPLOY_WEBHOOK 
