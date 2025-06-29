@@ -1,0 +1,28 @@
+<h2>Keyword Search</h2>
+<%= form_with url: keyword_search_results_path, method: :post, local: true, data: { turbo: false } do %>
+  <div class="keyword-buttons">
+    <% @all_keywords.each do |key| %>
+      <label class="keyword-btn">
+        <%= check_box_tag 'keywords[]', key, (@selected_keywords || []).include?(key.to_s) %>
+        <%= key.to_s.humanize %>
+      </label>
+    <% end %>
+  </div>
+  <%= submit_tag 'Search', class: 'search-btn' %>
+<% end %>
+<% if @jobs.any? %>
+  <h3>Matching Jobs</h3>
+  <ul>
+    <% @jobs.each do |job| %>
+      <li>
+        <strong><%= link_to job.page_title, webpage_path(job) %></strong>
+        <% if job.keyword_tags_found.present? %>
+          <br>
+          <small>Matched: <%= (job.keyword_tags_found.keys.map(&:to_s) & (@selected_keywords || [])).map(&:humanize).join(', ') %></small>
+        <% end %>
+      </li>
+    <% end %>
+  </ul>
+<% elsif defined?(@jobs) %>
+  <p>No jobs found for selected keywords.</p>
+<% end %> 

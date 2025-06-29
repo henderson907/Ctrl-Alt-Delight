@@ -10,5 +10,6 @@ Rails.application.routes.draw do
   root to: "pages#index"
   resources :webpages, only: [ :index, :show, :new, :create ]
   get "keyword_search", to: "webpages#keyword_search"
+  get "keyword_search_results", to: "webpages#keyword_search_results"
   post "keyword_search_results", to: "webpages#keyword_search_results"
 end
