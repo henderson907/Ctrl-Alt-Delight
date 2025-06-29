@@ -1,12 +1,15 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title><%= content_for(:title) || "Rails Web Crawler" %></title>
+    <title><%= content_for(:title) || "Octopus Challenge" %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&display=swap" rel="stylesheet">
 
     <%= yield :head %>
 
@@ -23,16 +26,10 @@
   </head>
 
   <body>
+    <%= render "shared/navbar" %>
     <% if flash[:alert] %>
       <%= flash[:alert] %>
     <% end %>
-    <nav class="navbar">
-      <ul>
-        <li><%= link_to "Home", root_path %></li>
-        <li><%= link_to "Analyse Page", root_path %></li>
-        <li><%= link_to "Keyword Search", keyword_search_path %></li>
-      </ul>
-    </nav>
     <% if flash[:notice] %>
       <%= flash[notice] %>
     <% end%>
