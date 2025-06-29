@@ -4,6 +4,10 @@
     <%= link_to "Analyse listing", new_webpage_path, class: "nav-btn" %>
     <%= link_to "Search listings", webpages_path, class: "nav-btn" %>
     <%= link_to "Keyword Search", keyword_search_path, class: "nav-btn" %>
-    <%= link_to "login", user_session_path, class: "nav-btn" %>
+    <% if user_signed_in? %>
+      <%= link_to "Logout", destroy_user_session_path, data: { "turbo-method": :delete }, class: "nav-btn" %>
+    <% else %>
+      <%= link_to "Login", user_session_path, class: "nav-btn" %>
+    <% end %>
   </div>
 </div>
