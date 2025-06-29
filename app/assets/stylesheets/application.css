@@ -73,6 +73,7 @@ th, td {
 }
 
 form {
+  width: 64%;
   display: flex;
   gap: 0.5rem;
   margin-bottom: 2rem;
@@ -80,8 +81,8 @@ form {
 
 input[type="url"] {
   flex: 1;
-  padding: 0.5rem;
-  font-size: 1rem;
+  padding: 0.8rem;
+  font-size: 24px;
   border: 1px solid #ccc;
   border-radius: 4px;
 }
@@ -105,17 +106,17 @@ button {
 }
 
 .analyze-button {
-  padding: 0.5rem 1rem;
-  font-size: 1rem;
+  padding: 0.5rem 1.2rem;
+  font-size: 24px;
   border: none;
-  background-color: #0645ad;
+  background-color: #FF47D8;
   color: white;
   border-radius: 4px;
   cursor: pointer;
 }
 
 .analyze-button:hover {
-  background-color: #042d73;
+  background-color: #6575F6;
 }
 
 .navbar {

@@ -1,7 +1,8 @@
+<div class="container">
+  <h1 class="landing-title">Let's Take A Look:</h1>
 
-<h1>Let's Take A Look:</h1>
-
-<%= form_for @webpage, url: {action: "create"} do |f| %>
-  <%= f.url_field :url, placeholder: "Enter the URL..." %>
-  <%= f.submit "Analyse", class: "analyze-button" %>
-<% end %>
+  <%= form_for @webpage, url: {action: "create"} do |f| %>
+    <%= f.url_field :url, placeholder: "Enter the URL..." %>
+    <%= f.submit "Analyse", class: "analyze-button" %>
+  <% end %>
+</div>
