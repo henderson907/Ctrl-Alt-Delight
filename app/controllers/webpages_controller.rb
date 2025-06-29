@@ -7,24 +7,24 @@ class WebpagesController < ApplicationController
   skip_before_action :authenticate_user!, only: [ :index, :show, :new, :create ]
   before_action :webpage_params, only: [ :create ]
 
-  # Updated keyword tags as requested
+  # Expanded keyword tags with synonyms and related terms
   KEYWORD_TAGS = {
-    fertility_support: [ "fertility support", "menopause care" ],
-    pay_transparency: [ "pay transparency", "salary transparency" ],
-    flexible_work: [ "flexible work hours", "remote-first", "flexible schedule", "hybrid working" ],
-    name_blind_recruitment: [ "name-blind recruitment" ],
-    religious_inclusion: [ "prayer space", "flexible religious leave", "eid leave", "religious holidays" ],
-    lgbtq_inclusive: [ "lgbtqia+", "pride", "queer inclusive" ],
-    alt_education: [ "non-traditional educational background", "no degree required", "bootcamp graduate" ],
-    ethnic_networks: [ "black employee network", "asian employee network", "diversity network" ],
-    accessibility: [ "step-free access", "wheelchair accessible", "accessible office" ],
-    inclusive_env: [ "inclusive work environment", "inclusive culture" ],
-    green_career: [ "green career", "climate job", "sustainability role" ],
-    mental_health: [ "mental health", "mental health days", "counselling", "wellbeing" ],
-    social_sustainability: [ "social sustainability" ],
-    wellness_programs: [ "wellness programs", "health & wellness", "gym membership" ],
-    cycling_scheme: [ "bike-to-work scheme", "cycle to work" ],
-    carbon_neutral: [ "carbon neutrality", "carbon neutral", "net zero" ]
+    fertility_support: ["fertility support", "menopause care"],
+    pay_transparency: ["pay transparency", "salary transparency"],
+    flexible_work: ["flexible work hours", "remote-first", "flexible schedule", "hybrid working", "flexible", "remote", "hybrid"],
+    name_blind_recruitment: ["name-blind recruitment"],
+    religious_inclusion: ["prayer space", "flexible religious leave", "eid leave", "religious holidays", "faith room", "multi-faith"],
+    lgbtq_inclusive: ["lgbtqia+", "pride", "queer inclusive", "lgbtq", "lgbt", "rainbow network"],
+    alt_education: ["non-traditional educational background", "no degree required", "bootcamp graduate", "no degree", "alternative education"],
+    ethnic_networks: ["black employee network", "asian employee network", "diversity network", "bame network", "ethnic network", "minority network"],
+    accessibility: ["step-free access", "wheelchair accessible", "accessible office", "disability access", "accessible", "neurodiverse", "reasonable adjustments"],
+    inclusive_env: ["inclusive work environment", "inclusive culture", "inclusive", "belonging"],
+    green_career: ["green career", "climate job", "sustainability role", "sustainable", "environmental", "eco-friendly", "carbon neutral", "net zero", "renewable", "solar", "wind", "biodiversity", "nature-based", "clean energy", "decarbonisation", "circular economy", "green", "climate", "carbon", "energy", "environment", "nature", "ecology", "planet", "earth", "conservation", "recycling", "waste", "emissions", "footprint"],
+    mental_health: ["mental health", "mental health days", "counselling", "wellbeing", "stress", "anxiety", "therapy", "support", "mindfulness"],
+    social_sustainability: ["social sustainability", "community impact", "social value", "social responsibility"],
+    wellness_programs: ["wellness programs", "health & wellness", "gym membership", "wellbeing", "wellness", "fitness", "health"],
+    cycling_scheme: ["bike-to-work scheme", "cycle to work", "cycling", "bike scheme"],
+    carbon_neutral: ["carbon neutrality", "carbon neutral", "net zero", "zero emissions", "carbon offset", "carbon free"]
   }
 
   STOP_WORDS = %w[the of and a to in is it you that he was for on are as with his they I at be this have from or one had by word but not what all were we when your can said there use an each which she do how their if]
@@ -157,9 +157,10 @@ class WebpagesController < ApplicationController
 
   def keyword_presence(text, keyword_hash)
     results = {}
+    downcased_text = text.downcase
     keyword_hash.each do |category, phrases|
       found = phrases.select do |phrase|
-        text.downcase.include?(phrase.downcase)
+        downcased_text.include?(phrase.downcase)
       end
       results[category] = found unless found.empty?
     end
@@ -194,9 +195,15 @@ class WebpagesController < ApplicationController
 
   def filter_jobs_by_keywords(selected_keywords)
     return [] if selected_keywords.blank?
+    selected_keywords = selected_keywords.map(&:to_s)
     Webpage.where.not(keyword_tags_found: nil).select do |webpage|
-      found = (webpage.keyword_tags_found || {}).keys.map(&:to_s)
-      (found & selected_keywords).any?
+      begin
+        found = (webpage.keyword_tags_found || {}).keys.map(&:to_s)
+        Rails.logger.debug "Selected: \\#{selected_keywords.inspect} | Found: \\#{found.inspect} | Match: \\#{(found & selected_keywords).any?} | Webpage ID: \\#{webpage.id}"
+        (found & selected_keywords).any?
+      rescue Psych::SyntaxError
+        false
+      end
     end
   end
 
