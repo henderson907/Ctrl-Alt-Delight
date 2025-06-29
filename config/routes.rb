@@ -8,7 +8,7 @@ Rails.application.routes.draw do
   get "up" => "rails/health#show", as: :rails_health_check
 
   root to: "pages#index"
-  resources :webpages, only: [ :index, :show, :create ]
+  resources :webpages, only: [ :index, :show, :new, :create ]
   get "keyword_search", to: "webpages#keyword_search"
   post "keyword_search_results", to: "webpages#keyword_search_results"
 end

@@ -1,30 +1,30 @@
 require "nokogiri"
 require "open-uri"
-require 'openai'
-require 'dotenv/load'
+require "openai"
+require "dotenv/load"
 
 class WebpagesController < ApplicationController
-  skip_before_action :authenticate_user!, only: [ :index, :show, :create ]
+  skip_before_action :authenticate_user!, only: [ :index, :show, :new, :create ]
   before_action :webpage_params, only: [ :create ]
 
   # Updated keyword tags as requested
   KEYWORD_TAGS = {
-    fertility_support: ["fertility support", "menopause care"],
-    pay_transparency: ["pay transparency", "salary transparency"],
-    flexible_work: ["flexible work hours", "remote-first", "flexible schedule", "hybrid working"],
-    name_blind_recruitment: ["name-blind recruitment"],
-    religious_inclusion: ["prayer space", "flexible religious leave", "eid leave", "religious holidays"],
-    lgbtq_inclusive: ["lgbtqia+", "pride", "queer inclusive"],
-    alt_education: ["non-traditional educational background", "no degree required", "bootcamp graduate"],
-    ethnic_networks: ["black employee network", "asian employee network", "diversity network"],
-    accessibility: ["step-free access", "wheelchair accessible", "accessible office"],
-    inclusive_env: ["inclusive work environment", "inclusive culture"],
-    green_career: ["green career", "climate job", "sustainability role"],
-    mental_health: ["mental health", "mental health days", "counselling", "wellbeing"],
-    social_sustainability: ["social sustainability"],
-    wellness_programs: ["wellness programs", "health & wellness", "gym membership"],
-    cycling_scheme: ["bike-to-work scheme", "cycle to work"],
-    carbon_neutral: ["carbon neutrality", "carbon neutral", "net zero"]
+    fertility_support: [ "fertility support", "menopause care" ],
+    pay_transparency: [ "pay transparency", "salary transparency" ],
+    flexible_work: [ "flexible work hours", "remote-first", "flexible schedule", "hybrid working" ],
+    name_blind_recruitment: [ "name-blind recruitment" ],
+    religious_inclusion: [ "prayer space", "flexible religious leave", "eid leave", "religious holidays" ],
+    lgbtq_inclusive: [ "lgbtqia+", "pride", "queer inclusive" ],
+    alt_education: [ "non-traditional educational background", "no degree required", "bootcamp graduate" ],
+    ethnic_networks: [ "black employee network", "asian employee network", "diversity network" ],
+    accessibility: [ "step-free access", "wheelchair accessible", "accessible office" ],
+    inclusive_env: [ "inclusive work environment", "inclusive culture" ],
+    green_career: [ "green career", "climate job", "sustainability role" ],
+    mental_health: [ "mental health", "mental health days", "counselling", "wellbeing" ],
+    social_sustainability: [ "social sustainability" ],
+    wellness_programs: [ "wellness programs", "health & wellness", "gym membership" ],
+    cycling_scheme: [ "bike-to-work scheme", "cycle to work" ],
+    carbon_neutral: [ "carbon neutrality", "carbon neutral", "net zero" ]
   }
 
   STOP_WORDS = %w[the of and a to in is it you that he was for on are as with his they I at be this have from or one had by word but not what all were we when your can said there use an each which she do how their if]
@@ -41,6 +41,10 @@ class WebpagesController < ApplicationController
     rescue Psych::SyntaxError
       @keyword_tags_found = {}
     end
+  end
+
+  def new
+    @webpage = Webpage.new
   end
 
   def create
@@ -176,7 +180,7 @@ class WebpagesController < ApplicationController
     response = client.chat(
       parameters: {
         model: "gpt-4.1-mini-2025-04-14",
-        messages: [{ role: "user", content: prompt }],
+        messages: [ { role: "user", content: prompt } ],
         temperature: 0.7
       }
     )
