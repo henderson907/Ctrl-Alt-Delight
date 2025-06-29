@@ -1,11 +1,16 @@
 body {
   font-family: system-ui, -apple-system, sans-serif;
-  max-width: 700px;
-  margin: 2rem auto;
-  padding: 0 1rem;
+  /* max-width: 700px; */
+  margin: 0px !important;
+  /* padding: 0 1rem; */
   line-height: 1.6;
   color: white;
   background-color: #180049;
+}
+
+.container {
+  max-width: 800px;
+  margin: 0px auto;
 }
 
 h1, h2 {
