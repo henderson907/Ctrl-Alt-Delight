@@ -7,8 +7,8 @@ Rails.application.routes.draw do
   # Can be used by load balancers and uptime monitors to verify that the app is live.
   get "up" => "rails/health#show", as: :rails_health_check
 
-  root to: "webpages#index"
+  root to: "pages#index"
   resources :webpages, only: [ :index, :show, :create ]
-  get 'keyword_search', to: 'webpages#keyword_search'
-  post 'keyword_search_results', to: 'webpages#keyword_search_results'
+  get "keyword_search", to: "webpages#keyword_search"
+  post "keyword_search_results", to: "webpages#keyword_search_results"
 end
