@@ -1,1 +1,8 @@
-<div class="navbar"></div>
+<div class="navbar">
+  <%= link_to "Project Name", root_path, class: "project-title" %>
+  <div class="action-buttons">
+    <%= link_to "Analyse listing", new_webpage_path, class: "nav-btn" %>
+    <%= link_to "Search listings", webpages_path, class: "nav-btn" %>
+    <%= link_to "login", user_session_path, class: "nav-btn" %>
+  </div>
+</div>
