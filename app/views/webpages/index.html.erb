@@ -1,15 +1,15 @@
 <body cz-shortcut-listen="true">
 <header>
-  <h1>Web Page Analyzer</h1>
+  <h1>Job Ad Analyser!</h1>
   <%= form_for @webpage, url: {action: "create"} do |f| %>
     <%= f.url_field :url, placeholder: "Enter the URL..." %>
-    <%= f.submit "Analyze", class: "analyze-button" %>
+    <%= f.submit "Analyse", class: "analyze-button" %>
   <% end %>
 </header>
 
 <main>
   <section>
-    <h2>Previously Analyzed Pages</h2>
+    <h2>Previously Analysed Pages</h2>
     <% if @webpages.empty?%>
       <p>Hmm, looks like you haven't analyzed any pages yet! To get you started, why don't you try:</p>
       <%# Used stimulus to add a copy to clipboard button %>
